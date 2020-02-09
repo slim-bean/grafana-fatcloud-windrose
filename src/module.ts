@@ -585,6 +585,9 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
       windrose: {ticksuffix: '%', angle: 90},
     };
     this.panel.pconfig.layout.polar.radialaxis = radialaxismapping[plot_type];
+    if (this.panel.pconfig.settings.radialaxis_ticksuffix) {
+      this.panel.pconfig.layout.polar.radialaxis.ticksuffix = ' ' + this.panel.pconfig.settings.radialaxis_ticksuffix;
+    }
 
     this.refresh();
   }
