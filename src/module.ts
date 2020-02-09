@@ -39,6 +39,7 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
       },
       layout: {
         autosize: false,
+        top_margin: -75,
         showlegend: true,
         legend: {orientation: 'v'},
         hovermode: 'closest',
@@ -208,8 +209,8 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
     }
 
     ////////////// WORKAROUND NOTICE: move graph down a bit to stop the title from blocking topmost angletick
-    let top_padding = 22;
-    $('.main-svg').css('padding-top', top_padding.toString() + 'px');
+    //let top_padding = 22;
+    //$('.main-svg').css('padding-top', top_padding.toString() + 'px');
 
     if (!this.initalized) {
       let options = {
@@ -249,6 +250,10 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
 
     this.sizeChanged = false;
     this.initalized = true;
+
+    if (this.layout.top_margin != undefined && this.layout.top_margin != null) {
+      $('.main-svg').css('margin-top', this.layout.top_margin.toString() + 'px');
+    }
   }
 
   onDataSnapshotLoad(snapshot) {

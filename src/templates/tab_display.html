@@ -50,6 +50,14 @@
 
   </div>
 
+  <div class="section gf-form-group">
+    <h5 class="section-heading">Layout</h5>
+    <div class="gf-form">
+      <label class="gf-form-label width-6">Top margin</label>
+      <input type="number" class="gf-form-input width-11" ng-model="ctrl.panel.pconfig.layout.top_margin" spellcheck="false" placeholder="-75" ng-blur="ctrl.onConfigChanged()"/>
+    </div>
+  </div>
+
   <div class="section gf-form-group" ng-show="ctrl.panel.pconfig.settings.plot === 'windrose'">
     <h5 class="section-heading">Windrose</h5>
 
