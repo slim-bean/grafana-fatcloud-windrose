@@ -140,6 +140,7 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
         }
       }
     }
+    return null;
   }
 
   onResize() {
@@ -259,7 +260,7 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
     this.sizeChanged = false;
     this.initalized = true;
 
-    if (this.layout.top_margin != undefined && this.layout.top_margin != null) {
+    if (this.layout.top_margin !== undefined && this.layout.top_margin != null) {
       $('.main-svg').css('margin-top', this.layout.top_margin.toString() + 'px');
     }
   }
@@ -586,7 +587,8 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
     };
     this.panel.pconfig.layout.polar.radialaxis = radialaxismapping[plot_type];
     if (this.panel.pconfig.settings.radialaxis_ticksuffix) {
-      this.panel.pconfig.layout.polar.radialaxis.ticksuffix = ' ' + this.panel.pconfig.settings.radialaxis_ticksuffix;
+      this.panel.pconfig.layout.polar.radialaxis.ticksuffix =
+        ' ' + this.panel.pconfig.settings.radialaxis_ticksuffix;
     }
 
     this.refresh();
