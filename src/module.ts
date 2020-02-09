@@ -3,8 +3,6 @@
 import {MetricsPanelCtrl} from 'app/plugins/sdk';
 
 import _ from 'lodash';
-import moment from 'moment';
-import angular from 'angular';
 import $ from 'jquery';
 
 import * as Plotly from './lib/plotly.min';
@@ -406,7 +404,9 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
         let num_angle = cfg.settings.petals;
         let angle = 360 / num_angle;
 
-        for (let i = 0; i < num_angle; i++) points_on_dir.push([]);
+        for (let i = 0; i < num_angle; i++) {
+          points_on_dir.push([]);
+        }
 
         // classify points into it
         for (let p = 0; p < num_points; p++) {
@@ -445,8 +445,9 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
               if (
                 pts[idx] >= speed_levels[bin_idx] &&
                 pts[idx] < speed_levels[bin_idx + 1]
-              )
+              ) {
                 bin_counter++;
+              }
             }
 
             let total_length = pts.length / num_points;
@@ -475,7 +476,7 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
 
         // and then the traces
         for (let bin_idx = 0; bin_idx < bin_num; bin_idx++) {
-          var trace = {};
+          let trace = {};
           let lower_level = speed_levels[bin_idx];
           let upper_level = speed_levels[bin_idx + 1];
           trace['name'] =
@@ -491,7 +492,8 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
             width: 0,
           };
           trace['fillcolor'] =
-            'hsl(' + (255 * (1 - bin_idx / (bin_num - 1))).toString() + ',100% ,60%)'; //',' + (50 + 50 * (1 - bin_idx / (bin_num - 1))).toString() + '% ,60%)';
+            //',' + (50 + 50 * (1 - bin_idx / (bin_num - 1))).toString() + '% ,60%)';
+            'hsl(' + (255 * (1 - bin_idx / (bin_num - 1))).toString() + ',100% ,60%)';
           this.traces.unshift(trace);
         }
       }
@@ -521,7 +523,7 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
 
   onConfigChanged() {
     if (this.graph && this.initalized) {
-      Plotly.Plots.purge(this.graph);
+      Plotly.purge(this.graph);
       this.graph.innerHTML = '';
       this.initalized = false;
     }
