@@ -74,9 +74,20 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
   mouse: any;
   data: any;
 
+  $element: any;
+
   /** @ngInject **/
-  constructor($scope, $injector, $window, private $rootScope, private uiSegmentSrv) {
+  constructor(
+    $scope,
+    $injector,
+    $element,
+    $window,
+    private $rootScope,
+    private uiSegmentSrv
+  ) {
     super($scope, $injector);
+
+    this.$element = $element;
 
     this.sizeChanged = true;
     this.initalized = false;
@@ -105,6 +116,7 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
     this.trace = {};
     this.traces = [];
     this.layout = $.extend(true, {}, this.panel.pconfig.layout);
+    //this.layout.autosize = true;
 
     this.events.on('init-edit-mode', this.onInitEditMode.bind(this));
     this.events.on('render', this.onRender.bind(this));
@@ -212,24 +224,20 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
     //let top_padding = 22;
     //$('.main-svg').css('padding-top', top_padding.toString() + 'px');
 
-    if (!this.initalized) {
-      let options = {
-        showLink: false,
-        displaylogo: false,
-        displayModeBar: this.panel.pconfig.settings.displayModeBar,
-        modeBarButtonsToRemove: ['sendDataToCloud'], //, 'select2d', 'lasso2d']
-      };
+    let options = {
+      showLink: false,
+      displaylogo: false,
+      displayModeBar: this.panel.pconfig.settings.displayModeBar,
+      modeBarButtonsToRemove: ['sendDataToCloud'], //, 'select2d', 'lasso2d']
+    };
 
-      let data = this.traces;
-      let rect = this.graph.getBoundingClientRect();
+    let data = this.traces;
+    let rect = this.graph.getBoundingClientRect();
 
-      this.layout = $.extend(true, {}, this.panel.pconfig.layout);
-      this.layout.height = this.height; // - top_padding;
-      this.layout.width = rect.width;
-      Plotly.newPlot(this.graph, data, this.layout, options);
-    } else {
-      Plotly.redraw(this.graph);
-    }
+    this.layout = $.extend(true, {}, this.panel.pconfig.layout);
+    this.layout.height = this.height; // - top_padding;
+    this.layout.width = rect.width;
+    Plotly.newPlot(this.graph, data, this.layout, options);
 
     if (this.sizeChanged && this.graph && this.layout) {
       let rect = this.graph.getBoundingClientRect();
@@ -260,10 +268,34 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
     this.onDataReceived(snapshot);
   }
 
+  setTooltip(message: string, color?: string) {
+    color = color || 'orange';
+
+    const _this = this;
+    _this.$scope.$apply(() => {
+      // Set tooltip message.
+      _this.error = message;
+
+      // Colorize the tooltip corner in a different color to indicate its not a native exception.
+      // .panel-info-corner-inner » border-left-color
+      _this.$element.find('.panel-info-corner-inner').css({'border-left-color': color});
+    });
+  }
+
   onDataReceived(dataList) {
     this.data = {};
     if (dataList.length < 1) {
       console.log('No data', dataList);
+
+      // https://stackoverflow.com/questions/31975855/remove-all-traces-from-plotly-js-plot
+      //Plotly.deleteTraces(this.graph, 0);
+
+      Plotly.purge(this.graph);
+
+      // Update panel corner with error messages in the next event cycle.
+      _.defer(this.setTooltip.bind(this, 'No data'));
+
+      return;
     } else {
       let dmapping = {
         x: null,
