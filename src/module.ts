@@ -2,6 +2,9 @@
 
 import {MetricsPanelCtrl} from 'app/plugins/sdk';
 
+// When packaging with "npx grafana-toolkit plugin:ci-{build,package}".
+//import {MetricsPanelCtrl} from 'grafana/app/plugins/sdk';
+
 import _ from 'lodash';
 import $ from 'jquery';
 
@@ -39,7 +42,6 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
       },
       layout: {
         autosize: false,
-        top_margin: -75,
         showlegend: true,
         legend: {orientation: 'v'},
         hovermode: 'closest',
@@ -145,7 +147,6 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
 
   onResize() {
     this.sizeChanged = true;
-    console.log('sz');
   }
 
   onDataError(err) {
@@ -216,53 +217,32 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
   }
 
   onRender() {
+
     // ignore fetching data if another panel is in fullscreen
     if (this.otherPanelInFullscreenMode() || !this.graph) {
       return;
     }
-
-    ////////////// WORKAROUND NOTICE: move graph down a bit to stop the title from blocking topmost angletick
-    //let top_padding = 22;
-    //$('.main-svg').css('padding-top', top_padding.toString() + 'px');
 
     let options = {
       showLink: false,
       displaylogo: false,
       displayModeBar: this.panel.pconfig.settings.displayModeBar,
       modeBarButtonsToRemove: ['sendDataToCloud'], //, 'select2d', 'lasso2d']
+      responsive: true,
     };
 
-    let data = this.traces;
     let rect = this.graph.getBoundingClientRect();
 
     this.layout = $.extend(true, {}, this.panel.pconfig.layout);
-    this.layout.height = this.height; // - top_padding;
+    this.layout.height = rect.height;
     this.layout.width = rect.width;
-    Plotly.newPlot(this.graph, data, this.layout, options);
+    this.layout.margin = {l: 30, r: 30, t: 30, b: 30};
 
-    if (this.sizeChanged && this.graph && this.layout) {
-      let rect = this.graph.getBoundingClientRect();
-      this.layout.height = this.height; // - top_padding;
-      this.layout.width = rect.width;
-      Plotly.Plots.resize(this.graph);
-    }
-
-    // if (this.sizeChanged && this.graph && this.layout) {
-    //   let rect = this.graph.getBoundingClientRect();
-    //   this.layout.width = rect.width;
-
-    //   ////////////// WORKAROUND NOTICE: get rid of this error "Resize must be passed a displayed plot div element."
-    //   let e = window.getComputedStyle(this.graph).display;
-    //   if (!e || 'none' === e) return;
-    //   Plotly.Plots.resize(this.graph);
-    // }
+    Plotly.newPlot(this.graph, this.traces, this.layout, options);
 
     this.sizeChanged = false;
     this.initalized = true;
 
-    if (this.layout.top_margin !== undefined && this.layout.top_margin != null) {
-      $('.main-svg').css('margin-top', this.layout.top_margin.toString() + 'px');
-    }
   }
 
   onDataSnapshotLoad(snapshot) {
@@ -595,7 +575,11 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
   }
 
   link(scope, elem, attrs, ctrl) {
+
     this.graph = elem.find('.plotly-spot')[0];
+    $(this.graph).css('width', 'inherit');
+    $(this.graph).css('height', 'inherit');
+
     this.initalized = false;
     elem.on('mousemove', evt => {
       this.mouse = evt;
