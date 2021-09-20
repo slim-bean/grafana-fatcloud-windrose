@@ -217,7 +217,6 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
   }
 
   onRender() {
-
     // ignore fetching data if another panel is in fullscreen
     if (this.otherPanelInFullscreenMode() || !this.graph) {
       return;
@@ -242,7 +241,6 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
 
     this.sizeChanged = false;
     this.initalized = true;
-
   }
 
   onDataSnapshotLoad(snapshot) {
@@ -252,14 +250,16 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
   setTooltip(message: string, color?: string) {
     color = color || 'orange';
 
-    const _this = this;
-    _this.$scope.$apply(() => {
+    const _local_this = this;
+    _local_this.$scope.$apply(() => {
       // Set tooltip message.
-      _this.error = message;
+      _local_this.error = message;
 
       // Colorize the tooltip corner in a different color to indicate its not a native exception.
       // .panel-info-corner-inner » border-left-color
-      _this.$element.find('.panel-info-corner-inner').css({'border-left-color': color});
+      _local_this.$element
+        .find('.panel-info-corner-inner')
+        .css({'border-left-color': color});
     });
   }
 
@@ -498,7 +498,7 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
           let lower_level = speed_levels[bin_idx];
           let upper_level = speed_levels[bin_idx + 1];
           trace['name'] =
-            lower_level.toString() + ' - ' + upper_level.toString() + ' m/s';
+            lower_level.toString() + ' - ' + upper_level.toString() + ' mph';
           trace['type'] = 'scatterpolar';
           trace['mode'] = 'lines';
           trace['theta'] = thetas;
@@ -562,7 +562,7 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
     this.panel.pconfig.layout.showlegend = legendmapping[plot_type];
 
     let radialaxismapping = {
-      scatter: {ticksuffix: ' m/s', angle: 90},
+      scatter: {ticksuffix: ' mph', angle: 90},
       windrose: {ticksuffix: '%', angle: 90},
     };
     this.panel.pconfig.layout.polar.radialaxis = radialaxismapping[plot_type];
@@ -575,7 +575,6 @@ class PlotlyPanelCtrl extends MetricsPanelCtrl {
   }
 
   link(scope, elem, attrs, ctrl) {
-
     this.graph = elem.find('.plotly-spot')[0];
     $(this.graph).css('width', 'inherit');
     $(this.graph).css('height', 'inherit');
